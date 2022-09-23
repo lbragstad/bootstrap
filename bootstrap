@@ -16,7 +16,8 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 # Install neovim from upstream since it's more up-to-date than what's available
 # from package repositories.
-if [[ ! -f "$HOME/.local/bin/nvim" ]]; then
+if [[ ! -d "$HOME/.local/bin" ]]; then
+        mkdir -p "$HOME/.local/bin"
         curl --output-dir "$HOME/Downloads/" -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
         cp "$HOME/Downloads/nvim.appimage" "$HOME/.local/bin/nvim"
         rm "$HOME/Downloads/nvim.appimage"
