@@ -6,7 +6,7 @@
 # Install tools
 sudo dnf -y module install nodejs:14
 sudo dnf -y copr enable luminoso/Signal-Desktop
-sudo dnf -y install alacritty tmux zsh signal-desktop gh util-linux-user gnome-tweaks htop i3
+sudo dnf -y install alacritty tmux zsh signal-desktop gh util-linux-user gnome-tweaks htop i3 gnome-shell-extension-pop-shell xprop
 
 # Stack obfuscates their download URL for their linux client. Install from
 # https://slack.com/downloads/linux
