@@ -18,10 +18,12 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 # from package repositories.
 if [[ ! -d "$HOME/.local/bin" ]]; then
         mkdir -p "$HOME/.local/bin"
-        curl --output-dir "$HOME/Downloads/" -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-        cp "$HOME/Downloads/nvim.appimage" "$HOME/.local/bin/nvim"
-        rm "$HOME/Downloads/nvim.appimage"
 fi
+# This will always update nvim
+curl --output-dir "$HOME/Downloads/" -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+cp "$HOME/Downloads/nvim.appimage" "$HOME/.local/bin/nvim"
+chmod +x "$HOME/.local/bin/nvim"
+rm "$HOME/Downloads/nvim.appimage"
 
 # Install tmux plugin manager if needed
 if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
