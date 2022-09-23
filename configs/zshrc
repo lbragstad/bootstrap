@@ -106,4 +106,8 @@ alias vi='nvim'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# Explicitly override WAYLAND_DISPLAY since window rendering is broken. See
+# https://github.com/alacritty/alacritty/issues/4739 for more details.
+alias alacritty="WAYLAND_DISPLAY= alacritty"
 export TERM=xterm-256color
