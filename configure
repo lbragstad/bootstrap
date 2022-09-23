@@ -13,6 +13,9 @@ for file in $configs; do
         ln -s "$dir/configs/$file" "$HOME/.$file"
 done
 
+# Make sure we install any tmux plugins
+"$HOME/.tmux/plugins/tpm/bin/install_plugins"
+
 # Drop custom zsh theme
 cp "$dir/configs/solus.zsh-theme" "$HOME/.oh-my-zsh/themes/"
 
