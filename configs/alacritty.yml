@@ -31,3 +31,7 @@ mouse:
 window:
   decorations: "none"
   startup_mode: "maximized"
+  # Create some space between the terminal text and the edge of the window
+  padding:
+    x: 10
+    y: 10
