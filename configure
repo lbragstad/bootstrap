@@ -34,3 +34,7 @@ fi
 
 rm -rf "${nvim_destination:?}"
 ln -s "$dir/nvim" "${nvim_destination:?}"
+
+# Install nvim plugins and commonly used LSPs (python, go, bash)
+nvim +PackerSync +qa
+nvim --headless -c ':LspInstall gopls pyright bashls' -c ':qa'
