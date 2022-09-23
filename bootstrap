@@ -16,9 +16,11 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 # Install neovim from upstream since it's more up-to-date than what's available
 # from package repositories.
-curl --output-dir "$HOME/Downloads/" -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-cp "$HOME/Downloads/nvim.appimage" "$HOME/.local/bin/nvim"
-rm "$HOME/Downloads/nvim.appimage"
+if [[ ! -f "$HOME/.local/bin/nvim" ]]; then
+        curl --output-dir "$HOME/Downloads/" -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+        cp "$HOME/Downloads/nvim.appimage" "$HOME/.local/bin/nvim"
+        rm "$HOME/Downloads/nvim.appimage"
+fi
 
 # Install tmux plugin manager if needed
 if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
