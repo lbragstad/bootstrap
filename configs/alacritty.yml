@@ -1,0 +1,28 @@
+font:
+  normal:
+    family: Hack
+    style: Regular
+  size: 11.0
+
+draw_bold_text_with_bright_colors: true
+
+colors:
+  primary:
+    background: '#000000'
+    foreground: '#d4d7d6'
+  normal:
+    black: '#000000'
+    red: '#cc3e44'
+    green: '#8dc149'
+    yellow: '#cbcb41'
+    blue: '#519aba'
+    magenta: '#f55385'
+    cyan: '#7494A3'
+    white: '#d4d7d6'
+
+
+selection:
+  save_to_clipboard: true
+
+mouse:
+  hide_when_typing: true

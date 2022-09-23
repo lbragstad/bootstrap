@@ -3,7 +3,7 @@
 # configure sets up a workstation with my preferences.
 
 dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-configs="tmux.conf"
+configs="tmux.conf alacritty.yml"
 
 for file in $configs; do
         rm -rf "$HOME/.$file"
