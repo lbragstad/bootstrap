@@ -42,6 +42,3 @@ if [[ ! -d "$HOME/.local/share/fonts" ]]; then
         unzip -d ~/.local/share/fonts -o /tmp/Hack.zip
         rm /tmp/Hack.zip
 fi
-
-## Configure extensions
-# firefox https://extensions.gnome.org/local/
