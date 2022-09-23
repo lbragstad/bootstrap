@@ -32,8 +32,5 @@ if [[ ! -d $nvim_destination ]]; then
         mkdir -p "$nvim_destination"
 fi
 
-nvim_configs="init.lua"
-for file in $nvim_configs; do
-        rm -rf "${nvim_destination:?}/$file"
-        ln -s "$dir/nvim/$file" "${nvim_destination:?}/$file"
-done
+rm -rf "${nvim_destination:?}"
+ln -s "$dir/nvim" "${nvim_destination:?}"
