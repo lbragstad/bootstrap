@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# bootstrap installs development tools, chat tools, and preferences, like
+# plugins or fonts.
+
+# Install tools
+sudo dnf -y module install nodejs:12
+sudo dnf -y install alacritty tmux zsh slack signal-desktop gh
+
+# Install oh-my-zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Install neovim from upstream since it's more up-to-date than what's available
+# from package repositories.
+curl --output-dir "$HOME/Downloads/" -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+cp "$HOME/Downloads/nvim.appimage" "$HOME/.local/bin/nvim"
+
+# Install tmux plugin manager if needed
+if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+        git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+fi
+
+# Make sure we have a directory for custom fonts
+if [[ ! -d "$HOME/.local/share/fonts" ]]; then
+        mkdir -p ~/.local/share/fonts
+fi
+
+# Install Hack Nerd Font - which contain glyphs used in various neovim and tmux
+# plugins
+wget -O /tmp/Hack.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/Hack.zip
+unzip -d ~/.local/share/fonts -o /tmp/Hack.zip
+rm /tmp/Hack.zip
