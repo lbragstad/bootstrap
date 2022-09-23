@@ -6,7 +6,7 @@
 chsh -s "$(which zsh)"
 
 dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-configs="tmux.conf alacritty.yml zshrc"
+configs="tmux.conf alacritty.yml zshrc gitignore_global gitconfig"
 
 for file in $configs; do
         rm -rf "$HOME/.$file"
