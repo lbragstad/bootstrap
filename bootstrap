@@ -6,7 +6,10 @@
 # Install tools
 sudo dnf -y module install nodejs:14
 sudo dnf -y copr enable luminoso/Signal-Desktop
-sudo dnf -y install alacritty tmux zsh slack signal-desktop gh
+sudo dnf -y install alacritty tmux zsh signal-desktop gh
+
+# Stack obfuscates their download URL for their linux client. Install from
+# https://slack.com/downloads/linux
 
 # Install oh-my-zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
