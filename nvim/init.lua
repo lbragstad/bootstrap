@@ -1,0 +1,7 @@
+require "lbragstad.options"
+require "lbragstad.colorscheme"
+require "lbragstad.keymaps"
+require "lbragstad.plugins"
+require "lbragstad.cmp"
+require "lbragstad.lsp"
+require "lbragstad.treesitter"

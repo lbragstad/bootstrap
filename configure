@@ -25,3 +25,15 @@ gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Pri
 gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-left "['<Ctrl><Shift>Left']"
 gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-right "['<Ctrl><Shift>Right']"
 gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'Alacritty.desktop', 'firefox.desktop', 'slack.desktop']"
+
+# Make sure we have a place for nvim configuration.
+nvim_destination="$HOME/.config/nvim"
+if [[ ! -d $nvim_destination ]]; then
+        mkdir -p "$nvim_destination"
+fi
+
+nvim_configs="init.lua"
+for file in $nvim_configs; do
+        rm -rf "${nvim_destination:?}/$file"
+        ln -s "$dir/nvim/$file" "${nvim_destination:?}/$file"
+done
