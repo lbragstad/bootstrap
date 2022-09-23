@@ -3,7 +3,7 @@
 A collection of scripts and documentation to make bootstrapping new
 workstations easier.
 
-The `bootstrap` script installs and updates tools and applications. Use
+The `install` script installs and updates tools and applications. Use
 `configure` to apply preferences. Anything that isn't automated yet is
 documented below.
 
