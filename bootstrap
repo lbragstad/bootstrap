@@ -43,3 +43,5 @@ if [[ ! -d "$HOME/.local/share/fonts" ]]; then
         rm /tmp/Hack.zip
 fi
 
+## Configure extensions
+# firefox https://extensions.gnome.org/local/
