@@ -26,3 +26,8 @@ selection:
 
 mouse:
   hide_when_typing: true
+
+# Workaround for https://github.com/alacritty/alacritty/issues/4739
+window:
+  decorations: "none"
+  startup_mode: "maximized"
