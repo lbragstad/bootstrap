@@ -15,3 +15,10 @@ done
 
 # Drop custom zsh theme
 cp "$dir/configs/solus.zsh-theme" "$HOME/.oh-my-zsh/themes/"
+
+# Set keybindings for workspace management
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['<Primary><Alt>Left']"
+gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Primary><Alt>Right']"
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-left "['<Ctrl><Shift>Left']"
+gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-right "['<Ctrl><Shift>Right']"
+gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'Alacritty.desktop', 'firefox.desktop', 'slack.desktop']"
