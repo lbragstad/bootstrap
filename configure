@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# configure sets up a workstation with my preferences.
+
+configs="tmux.conf"
+
+for file in $configs; do
+        rm -rf "$HOME/.$file"
+        ln -s "configs/$file" "$HOME/.$file"
+done
