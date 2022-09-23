@@ -4,7 +4,8 @@
 # plugins or fonts.
 
 # Install tools
-sudo dnf -y module install nodejs:12
+sudo dnf -y module install nodejs:14
+sudo dnf copr enable luminoso/Signal-Desktop
 sudo dnf -y install alacritty tmux zsh slack signal-desktop gh
 
 # Install oh-my-zsh
