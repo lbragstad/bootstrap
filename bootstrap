@@ -14,6 +14,10 @@ sudo dnf -y install alacritty tmux zsh signal-desktop gh util-linux-user gnome-t
 # Install oh-my-zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
+# Install GVM and dependencies
+sudo dnf -y install bison
+bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+
 # Install neovim from upstream since it's more up-to-date than what's available
 # from package repositories.
 if [[ ! -d "$HOME/.local/bin" ]]; then
