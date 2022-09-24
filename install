@@ -9,7 +9,7 @@ sudo dnf -y copr enable luminoso/Signal-Desktop
 # Install golang from packages, otherwise we'll hit a bootstrap problem
 # compiling later versions of golang. See
 # https://github.com/moovweb/gvm#a-note-on-compiling-go-15
-sudo dnf -y install alacritty tmux zsh signal-desktop gh util-linux-user gnome-tweaks htop i3 gnome-shell-extension-pop-shell xprop gnome-shell-extension golang
+sudo dnf -y install alacritty tmux zsh signal-desktop gh util-linux-user gnome-tweaks htop i3 gnome-shell-extension-pop-shell xprop golang
 
 # Stack obfuscates their download URL for their linux client. Install from
 # https://slack.com/downloads/linux
