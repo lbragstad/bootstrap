@@ -26,6 +26,14 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-left "['<Ctrl><
 gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-right "['<Ctrl><Shift>Right']"
 gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'Alacritty.desktop', 'firefox.desktop', 'slack.desktop']"
 
+# Configure useful binaries
+binaries="cce cockpit desk fail git-ready git-rebase phonetic-alphabet rm-k8s-configs rm-pyc speed-test sprint-estimates try upgrade-nvim"
+
+for binary in $binaries; do
+        rm -rf "$HOME/.local/bin/$binary"
+        ln -s "$dir/bin/$binary" "$HOME/.local/bin/$binary"
+done
+
 # Make sure we have a place for nvim configuration.
 nvim_destination="$HOME/.config/nvim"
 if [[ ! -d $nvim_destination ]]; then

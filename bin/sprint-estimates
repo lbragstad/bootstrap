@@ -1,0 +1,10 @@
+#!/bin/bash
+echo "
+1: 1-2 hours
+2: half-day
+3: full day
+5: 2-3 days
+8: 1 week
+13: two weeks
+21: full sprint (should be broken down)
+"

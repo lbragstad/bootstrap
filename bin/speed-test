@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+SCRIPT=https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
+
+curl -s $SCRIPT | python3 -

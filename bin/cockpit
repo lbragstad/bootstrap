@@ -1,0 +1,15 @@
+#!/bin/bash
+# setup a tmux window as a workbench with multiple panes and organized.
+
+# create monitoring panes and use the main-horizontal layout for a workspace
+tmux split-window -v
+tmux split-window -v
+tmux split-window -v
+tmux select-layout main-horizontal
+
+# make the main pane larger as the primary work surface
+tmux resize-pane -t:.0 -y 70
+
+# select the main horizontal pane and split it in half
+tmux select-pane -t 0
+tmux split-window -h

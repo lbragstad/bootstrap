@@ -1,0 +1,4 @@
+#!/bin/bash
+# clean out any downloaded k8s configs
+
+rm ~/Downloads/cluster-bot-*

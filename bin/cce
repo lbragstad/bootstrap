@@ -1,0 +1,7 @@
+#!/bin/bash
+
+CONTENT=$HOME/Projects/content
+CCE_FILE=$CONTENT/shared/references/cce-redhat-avail.txt
+CCE=`shuf -n 1 $CCE_FILE`
+sed -i "/^$CCE/d" $CCE_FILE
+echo $CCE

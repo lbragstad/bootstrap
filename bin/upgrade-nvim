@@ -1,0 +1,6 @@
+#!/bin/bash
+
+curl --output-dir ~/Downloads/ -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+
+cp ~/Downloads/nvim.appimage ~/.local/bin/nvim
+

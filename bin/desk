@@ -1,0 +1,18 @@
+#!/bin/bash
+# setup a tmux window with dedicated pane for editing and two additional panes
+# for monitoring and other tasks.
+
+# create monitoring panes and use the main-vertical layout for a workspace
+tmux split-window -v -l 30%
+
+tmux select-pane -t 1
+tmux split-window -h
+
+tmux rename-window desk
+
+# make the main pane larger as the primary work surface
+# tmux resize-pane -t:.2 -x 300
+
+for pane in 0 1 2; do
+  tmux send-keys -t $pane "clear" Enter
+done
