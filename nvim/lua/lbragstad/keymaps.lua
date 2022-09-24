@@ -23,8 +23,6 @@ keymap("n", "<leader>n", ":bn<CR>", opts)
 -- Navigate to previous buffer
 keymap("n", "<leader>p", ":bp<CR>", opts)
 
-keymap("n", "<leader>d", ":GoDoc<CR>", opts)
-
 -- Resize with arrows
 keymap("n", "<C-Up>", ":resize -2<CR>", opts)
 keymap("n", "<C-Down>", ":resize +2<CR>", opts)
