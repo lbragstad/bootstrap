@@ -111,3 +111,9 @@ alias vi='nvim'
 # https://github.com/alacritty/alacritty/issues/4739 for more details.
 alias alacritty="WAYLAND_DISPLAY= alacritty"
 export TERM=xterm-256color
+
+# Load git completion for zsh and bash (which is a dependency for
+# git-completion.zsh)
+zstyle ':completion:*:*:git:*' script ~/.zsh/git-completion.bash
+fpath=(~/.zsh $fpath)
+autoload -Uz compinit && compinit

@@ -19,6 +19,13 @@ done
 # Drop custom zsh theme
 cp "$dir/configs/solus.zsh-theme" "$HOME/.oh-my-zsh/themes/"
 
+# Install git completion for zsh, and bash since it's a dependency for zsh
+rm -f ~/.zsh/git-completion.bash
+rm -f ~/_git
+ln -s "$dir/configs/git-completion.bash" "$HOME/.zsh/git-completion.bash"
+ln -s "$dir/configs/git-completion.zsh" "$HOME/_git"
+
+
 # Set keybindings for workspace management
 gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-left "['<Primary><Alt>Left']"
 gsettings set org.gnome.desktop.wm.keybindings switch-to-workspace-right "['<Primary><Alt>Right']"
