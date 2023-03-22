@@ -57,8 +57,10 @@ return packer.startup(function(use)
   use "nvim-telescope/telescope.nvim"
 
   -- LSP plugins
+  use "ray-x/lsp_signature.nvim"
+  use "williamboman/mason.nvim"
+  use "williamboman/mason-lspconfig.nvim"
   use "neovim/nvim-lspconfig"
-  use "williamboman/nvim-lsp-installer"
 
   -- Syntax highlighting
   -- Install languages using :TSInstall $LANGUAGE (:TSInstall python)
