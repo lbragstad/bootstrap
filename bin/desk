@@ -3,7 +3,7 @@
 # for monitoring and other tasks.
 
 # create monitoring panes and use the main-vertical layout for a workspace
-tmux split-window -v -l 30%
+tmux split-window -v -l 40%
 
 tmux select-pane -t 1
 tmux split-window -h
