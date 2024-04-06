@@ -118,3 +118,12 @@ export TERM=xterm-256color
 zstyle ':completion:*:*:git:*' script ~/.zsh/git-completion.bash
 fpath=(~/.zsh $fpath)
 autoload -Uz compinit && compinit
+
+# eval "$(_BUILD_CATALOG_COMPLETE=zsh_source build-catalog)"
+# source ~/.build-catalog-complete.zsh
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/lbragstad/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/home/lbragstad/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/lbragstad/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/lbragstad/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
