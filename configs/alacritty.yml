@@ -29,7 +29,7 @@ mouse:
 
 # Workaround for https://github.com/alacritty/alacritty/issues/4739
 window:
-  decorations: "none"
+  decorations: "full"
   startup_mode: "maximized"
   # Create some space between the terminal text and the edge of the window
   padding:
