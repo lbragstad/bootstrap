@@ -22,6 +22,8 @@ keymap("n", "<leader>e", ":NvimTreeToggle<CR>", opts)
 keymap("n", "<leader>n", ":bn<CR>", opts)
 -- Navigate to previous buffer
 keymap("n", "<leader>p", ":bp<CR>", opts)
+-- Close current buffer
+keymap("n", "<leader>c", ":bd<CR>", opts)
 
 -- Resize with arrows
 keymap("n", "<C-Up>", ":resize -2<CR>", opts)
