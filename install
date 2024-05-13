@@ -3,12 +3,16 @@
 # bootstrap installs development tools, chat tools, and preferences, like
 # plugins or fonts.
 
+# Setup docker repository
+sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+
 # Install tools
 sudo dnf -y module install nodejs:14
+
 # Install golang from packages, otherwise we'll hit a bootstrap problem
 # compiling later versions of golang. See
 # https://github.com/moovweb/gvm#a-note-on-compiling-go-15
-sudo dnf -y install alacritty tmux tmate zsh gh util-linux-user gnome-tweaks htop i3 gnome-shell-extension-pop-shell xprop golang python-pip skopeo ffmpeg-free ffmpeg-free-devel gcc-c++
+sudo dnf -y install alacritty tmux tmate zsh gh util-linux-user gnome-tweaks htop i3 gnome-shell-extension-pop-shell xprop golang python-pip skopeo ffmpeg-free ffmpeg-free-devel gcc-c++ docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install flathub org.signal.Signal
