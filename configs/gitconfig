@@ -7,7 +7,7 @@
 	email = lbragsta@redhat.com
 	name = Lance Bragstad
 [core]
-  editor = /usr/bin/vim
+  editor = nvim
   excludesfile = /home/lancebragstad/.gitignore_global
   excludefiles = /home/lbragstad/.gitignore
   pager = less -F -X
@@ -22,3 +22,13 @@
   st = status
   d = diff
   l = log
+[safe]
+	directory = /home/lbragstad/go/src/github.com/rhmdnd/stackrox
+	directory = /home/lbragstad/go/src/github.com/rhmdnd/stackrox
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+[url "git@github.com:"]
+	insteadOf = https://github.com/
