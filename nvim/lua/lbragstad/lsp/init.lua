@@ -41,13 +41,6 @@ configure = function ()
   }
   vim.diagnostic.config(config)
 
-  vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = '*.go',
-    callback = function()
-      vim.lsp.buf.code_action({ context = { only = { 'source.organizeImports' } }, apply = true })
-    end
-  })
-
   vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
     border = "rounded",
   })
@@ -76,7 +69,7 @@ configure = function ()
   vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = { "*.go" },
   callback = function()
-	  vim.lsp.buf.format(nil, 3000)
+         vim.lsp.buf.format(nil, 3000)
   end,
   })
 
@@ -106,7 +99,21 @@ require("mason-lspconfig").setup {
     ensure_installed = { "gopls", "marksman", "pyright", "bashls" },
 }
 require("lsp_signature").setup()
-require"lspconfig".gopls.setup{}
+util = require "lspconfig/util"
+require"lspconfig".gopls.setup{
+    cmd = {"gopls", "serve"},
+    filetypes = {"go", "gomod"},
+    root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+    settings = {
+      gopls = {
+        buildFlags = {"-tags=compliance"},
+        analyses = {
+          unusedparams = true,
+        },
+        staticcheck = true,
+      },
+    },
+  }
 require'lspconfig'.pyright.setup{}
 require'lspconfig'.marksman.setup{}
 require'lspconfig'.bashls.setup{}
