@@ -8,7 +8,7 @@ tmux split-window -v
 tmux select-layout main-horizontal
 
 # make the main pane larger as the primary work surface
-tmux resize-pane -t:.0 -y 70
+tmux resize-pane -t:.0 -y 60%
 
 # select the main horizontal pane and split it in half
 tmux select-pane -t 0
