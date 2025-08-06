@@ -81,8 +81,7 @@ cmp.setup {
         luasnip.jump(-1)
       else
         fallback()
-      end
-    end, { "i", "s" }),
+      end end, { "i", "s" }),
   },
   formatting = {
     fields = { "kind", "abbr", "menu" },

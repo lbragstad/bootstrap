@@ -117,5 +117,5 @@ require"lspconfig".gopls.setup{
 require'lspconfig'.pyright.setup{}
 require'lspconfig'.marksman.setup{}
 require'lspconfig'.bashls.setup{}
-require'lspconfig'.tsserver.setup{}
+require'lspconfig'.ts_ls.setup{}
 configure()
