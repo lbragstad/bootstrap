@@ -1,6 +1,10 @@
 #!/bin/bash
+set -euo pipefail
 
-curl --output-dir ~/Downloads/ -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+# neovim renamed the release asset to include the platform (was nvim.appimage)
+asset="nvim-linux-x86_64.appimage"
 
-cp ~/Downloads/nvim.appimage ~/.local/bin/nvim
+curl --fail --output-dir ~/Downloads/ -LO "https://github.com/neovim/neovim/releases/latest/download/$asset"
 
+cp ~/Downloads/"$asset" ~/.local/bin/nvim
+chmod +x ~/.local/bin/nvim
