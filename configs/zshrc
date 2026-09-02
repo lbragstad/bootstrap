@@ -74,7 +74,6 @@ ZSH_THEME="solus"
 plugins=(git history-substring-search virtualenv golang vi-mode gh)
 
 source $ZSH/oh-my-zsh.sh
-source $HOME/.gvm/scripts/gvm
 export GO111MODULE="on"
 export EDITOR='nvim'
 
@@ -127,3 +126,13 @@ if [ -f '/home/lbragstad/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/ho
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/home/lbragstad/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/lbragstad/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+
+export PATH=$HOME/.npm-global/bin:$PATH
+
+[[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
+
+
+# gws token wrapper — auto-refreshes OAuth token on every call
+gws() {
+    GOOGLE_WORKSPACE_CLI_TOKEN="$(gcloud auth application-default print-access-token)" command gws "$@"
+}
