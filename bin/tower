@@ -1,0 +1,33 @@
+#!/bin/bash
+# setup a tmux window as a control tower: one wide driver pane on the left to
+# edit and launch/steer from, and a 2x3 grid of agent panes on the right so
+# many agents stay visible at once instead of buried in separate windows.
+
+# carve the window into a driver column (left, 40%) and a work area (right, 60%)
+tmux split-window -h -l 60%
+
+# split the work area into two equal columns
+tmux split-window -h -l 50%
+
+# split the right-most column into three even rows
+tmux split-window -v -l 67%
+tmux split-window -v -l 50%
+
+# hop back to the middle column and split it into three even rows
+tmux select-pane -L
+tmux split-window -v -l 67%
+tmux split-window -v -l 50%
+
+tmux rename-window tower
+
+# label each pane border with its index and running command so agents are
+# easy to tell apart (window-scoped, leaves desk/cockpit untouched)
+tmux set-window-option pane-border-status top
+tmux set-window-option pane-border-format ' #{pane_index}: #{pane_current_command} '
+
+# clear every pane and land on the driver
+for pane in $(tmux list-panes -F '#{pane_index}'); do
+  tmux send-keys -t "$pane" "clear" Enter
+done
+
+tmux select-pane -t 0

@@ -1,18 +1,27 @@
 #!/bin/bash
-# setup a tmux window with dedicated pane for editing and two additional panes
-# for monitoring and other tasks.
+# setup a tmux window as an IDE-style workspace tuned for a large screen:
+# two full-height columns for viewing large files side by side (nvim already
+# provides its own file tree and fuzzy finder), plus a utility column split
+# into the git and terminal panels nvim does not provide.
 
-# create monitoring panes and use the main-vertical layout for a workspace
-tmux split-window -v -l 40%
+# editor column (left, 50%) and the work area (right, 50%)
+tmux split-window -h -l 50%
 
-tmux select-pane -t 1
-tmux split-window -h
+# split the work area into a full-height viewer column and a utility column
+tmux split-window -h -l 50%
+
+# split the utility column into git (top) and a terminal drawer (bottom)
+tmux split-window -v -l 50%
 
 tmux rename-window desk
 
-# make the main pane larger as the primary work surface
-# tmux resize-pane -t:.2 -x 300
+# label each pane border with its index and running command (window-scoped)
+tmux set-window-option pane-border-status top
+tmux set-window-option pane-border-format ' #{pane_index}: #{pane_current_command} '
 
-for pane in 0 1 2; do
-  tmux send-keys -t $pane "clear" Enter
+# clear every pane and land on the editor
+for pane in $(tmux list-panes -F '#{pane_index}'); do
+  tmux send-keys -t "$pane" "clear" Enter
 done
+
+tmux select-pane -t 0

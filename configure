@@ -34,7 +34,7 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-workspace-right "['<Ctrl>
 gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop', 'Alacritty.desktop', 'firefox.desktop', 'slack.desktop']"
 
 # Configure useful binaries
-binaries="cce cockpit desk fail git-ready git-rebase phonetic-alphabet rm-k8s-configs rm-pyc speed-test sprint-estimates try upgrade-nvim"
+binaries="cce cockpit desk fail git-ready git-rebase phonetic-alphabet rm-k8s-configs rm-pyc speed-test sprint-estimates tower try upgrade-nvim"
 
 for binary in $binaries; do
         rm -rf "$HOME/.local/bin/$binary"
