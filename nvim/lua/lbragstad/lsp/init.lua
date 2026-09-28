@@ -90,7 +90,6 @@ vim.lsp.config("gopls", {
     filetypes = {"go", "gomod"},
     settings = {
       gopls = {
-        buildFlags = {"-tags=compliance"},
         analyses = {
           unusedparams = true,
         },
