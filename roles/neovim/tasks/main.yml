@@ -1,0 +1,88 @@
+---
+# Fedora's neovim lags upstream badly enough to matter for the LSP config, so
+# take the AppImage. Homebrew tracks upstream closely, so the Mac uses a formula.
+- name: Install neovim from the upstream AppImage
+  ansible.builtin.get_url:
+    url: "{{ nvim_appimage_url }}"
+    dest: "{{ local_bin }}/nvim"
+    mode: "0755"
+    force: "{{ bootstrap_update | bool }}"
+  when: ansible_facts['os_family'] == 'RedHat'
+  tags: [update]
+
+- name: Install neovim
+  community.general.homebrew:
+    name: neovim
+    state: "{{ 'latest' if bootstrap_update | bool else 'present' }}"
+    path: "{{ homebrew_prefix }}/bin"
+  when: ansible_facts['os_family'] == 'Darwin'
+  tags: [update]
+
+- name: Create ~/.config
+  ansible.builtin.file:
+    path: "{{ home }}/.config"
+    state: directory
+    mode: "0755"
+
+- name: Check for an existing ~/.config/nvim
+  ansible.builtin.stat:
+    path: "{{ home }}/.config/nvim"
+    follow: false
+  register: neovim_existing
+
+- name: Remove a real ~/.config/nvim directory
+  ansible.builtin.file:
+    path: "{{ home }}/.config/nvim"
+    state: absent
+  when:
+    - neovim_existing.stat.exists
+    - neovim_existing.stat.isdir | default(false)
+    - not (neovim_existing.stat.islnk | default(false))
+
+- name: Link the neovim configuration
+  ansible.builtin.file:
+    src: "{{ bootstrap_repo }}/nvim"
+    dest: "{{ home }}/.config/nvim"
+    state: link
+    force: true
+
+- name: Install plugins and language servers
+  # nvim itself lives in ~/.local/bin on Fedora, and mason shells out to go, npm
+  # and pip to build the language servers. Neither is necessarily on the PATH
+  # ansible inherits, so put both prefixes in front of it.
+  environment:
+    PATH: "{{ local_bin }}:{{ homebrew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"
+  block:
+    # plugins.lua clones packer itself on first start, but it does so as a side
+    # effect of a run that is expected to fail, which means a clone that fails
+    # for a real reason looks identical to a normal first boot. Cloning it here
+    # instead keeps the failure visible and makes PackerSync below safe to run:
+    # without packer the PackerComplete autocmd never fires and headless nvim
+    # hangs until the task times out.
+    - name: Install packer
+      ansible.builtin.git:
+        repo: https://github.com/wbthomason/packer.nvim
+        dest: "{{ home }}/.local/share/nvim/site/pack/packer/start/packer.nvim"
+        depth: 1
+        version: master
+        update: "{{ bootstrap_update | bool }}"
+      tags: [update]
+
+    - name: Synchronise neovim plugins
+      ansible.builtin.command:
+        cmd: nvim --headless -c 'autocmd User PackerComplete quitall' -c 'PackerSync'
+      # PackerSync reports progress on stderr with no machine-readable summary,
+      # so there is nothing reliable to derive a changed state from.
+      changed_when: false
+      timeout: 600
+      tags: [update]
+
+    # mason-lspconfig's ensure_installed handles this interactively, but it is
+    # async and a headless nvim exits before it finishes. MasonInstall runs
+    # synchronously when nvim is headless, which makes it usable from a playbook.
+    - name: Install language servers
+      ansible.builtin.command:
+        cmd: "nvim --headless -c 'MasonInstall {{ nvim_language_servers | join(' ') }}' -c 'quitall'"
+      changed_when: false
+      timeout: 900
+      tags: [update]

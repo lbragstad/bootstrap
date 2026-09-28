@@ -1,0 +1,19 @@
+---
+# Hack Nerd Font supplies the glyphs the tmux and neovim statuslines expect. On
+# macOS it arrives as the font-hack-nerd-font cask instead, so this is Fedora only.
+- name: Install Hack Nerd Font
+  when: ansible_facts['os_family'] == 'RedHat'
+  block:
+    - name: Create the user font directory
+      ansible.builtin.file:
+        path: "{{ home }}/.local/share/fonts"
+        state: directory
+        mode: "0755"
+
+    - name: Unpack Hack Nerd Font
+      ansible.builtin.unarchive:
+        src: "{{ nerd_font_url }}"
+        dest: "{{ home }}/.local/share/fonts"
+        remote_src: true
+        creates: "{{ home }}/.local/share/fonts/HackNerdFont-Regular.ttf"
+      notify: Rebuild the font cache

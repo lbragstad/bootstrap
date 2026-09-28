@@ -1,0 +1,38 @@
+# Ghostty configuration, symlinked to ~/.config/ghostty/config.
+# Ported from the alacritty config this replaced.
+
+font-family = Hack Nerd Font
+font-style = Regular
+font-size = 12
+
+bold-is-bright = true
+
+background = #000000
+foreground = #d4d7d6
+
+palette = 0=#000000
+palette = 1=#cc3e44
+palette = 2=#8dc149
+palette = 3=#cbcb41
+palette = 4=#519aba
+palette = 5=#f55385
+palette = 6=#7494a3
+palette = 7=#d4d7d6
+
+# alacritty's selection.save_to_clipboard. Ghostty defaults to the primary
+# selection on Linux, so this has to be set explicitly.
+copy-on-select = clipboard
+
+mouse-hide-while-typing = true
+
+# Send shift to the running program with the mouse protocol instead of
+# extending the terminal's own selection. A program can still opt out with
+# XTSHIFTESCAPE; use `always` to take that choice away from it.
+mouse-shift-capture = true
+
+window-decoration = auto
+maximize = true
+
+# Create some space between the terminal text and the edge of the window
+window-padding-x = 10
+window-padding-y = 10

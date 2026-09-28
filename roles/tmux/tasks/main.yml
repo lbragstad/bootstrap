@@ -1,0 +1,42 @@
+---
+- name: Install the tmux plugin manager
+  ansible.builtin.git:
+    repo: https://github.com/tmux-plugins/tpm.git
+    dest: "{{ home }}/.tmux/plugins/tpm"
+    depth: 1
+    version: master
+    update: "{{ bootstrap_update | bool }}"
+  tags: [update]
+
+# install_plugins reads TMUX_PLUGIN_MANAGER_PATH out of the tmux server
+# environment, which tmux.conf sets by way of tpm. tmux only sources the config
+# at the moment it starts a server, so a server that was already running before
+# tpm was installed never picks the variable up and install_plugins aborts with
+# "Tmux Plugin Manager not configured". Sourcing explicitly handles that as well
+# as the no-server-at-all case.
+- name: Load the tmux configuration into the server
+  ansible.builtin.command:
+    argv:
+      - tmux
+      - start-server
+      - ;
+      - source-file
+      - "{{ home }}/.tmux.conf"
+  changed_when: false
+
+- name: Install tmux plugins
+  ansible.builtin.command:
+    cmd: "{{ home }}/.tmux/plugins/tpm/bin/install_plugins"
+  register: tmux_tpm
+  # tpm prints a line per plugin, so a run that installs one plugin and skips
+  # another reports both states. Only a download means anything changed.
+  changed_when: "'download success' in tmux_tpm.stdout"
+
+# See the note in the packages role: never is defeated by the role-level tags,
+# so this keys off bootstrap_update rather than the tag alone.
+- name: Update tmux plugins
+  ansible.builtin.command:
+    cmd: "{{ home }}/.tmux/plugins/tpm/bin/update_plugins all"
+  changed_when: true
+  when: bootstrap_update | bool
+  tags: [update]

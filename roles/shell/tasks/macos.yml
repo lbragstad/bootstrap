@@ -1,0 +1,27 @@
+---
+# dscl only reads the local node, so a lookup that fails means the account comes
+# from a bound directory and dscl cannot write its shell either.
+- name: Check for a local account record
+  ansible.builtin.command:
+    cmd: dscl . -read /Users/{{ ansible_facts['user_id'] | quote }} UserShell
+  register: shell_local_account
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Set zsh as the default shell
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_facts['user_id'] }}"
+    shell: "{{ shell_zsh.stdout }}"
+  when: shell_local_account.rc == 0
+
+# macOS has no equivalent of SSSD's override_shell, so there is nothing to do
+# locally. This is close to a non-problem in practice: macOS has created
+# accounts with zsh since Catalina.
+- name: Report that a bound account changes its shell in the directory
+  ansible.builtin.debug:
+    msg: >-
+      {{ ansible_facts['user_id'] }} is a directory account, so its login shell
+      has to be changed in the directory rather than on this Mac.
+  when: shell_local_account.rc != 0

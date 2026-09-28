@@ -1,0 +1,68 @@
+---
+- name: Link configs into the home directory
+  ansible.builtin.file:
+    src: "{{ bootstrap_repo }}/configs/{{ item }}"
+    dest: "{{ home }}/.{{ item }}"
+    state: link
+    force: true
+  loop: "{{ dotfiles }}"
+
+# ~/.gitconfig used to be a symlink into configs/. Templating through a dangling
+# symlink would write into the repository, so drop the link first.
+- name: Check whether ~/.gitconfig is still a symlink
+  ansible.builtin.stat:
+    path: "{{ home }}/.gitconfig"
+    follow: false
+  register: dotfiles_gitconfig
+
+- name: Remove the old ~/.gitconfig symlink
+  ansible.builtin.file:
+    path: "{{ home }}/.gitconfig"
+    state: absent
+  when: dotfiles_gitconfig.stat.islnk | default(false)
+
+- name: Render ~/.gitconfig
+  ansible.builtin.template:
+    src: gitconfig.j2
+    dest: "{{ home }}/.gitconfig"
+    mode: "0644"
+
+- name: Create the ghostty config directory
+  ansible.builtin.file:
+    path: "{{ home }}/.config/ghostty"
+    state: directory
+    mode: "0755"
+
+- name: Link the ghostty configuration
+  ansible.builtin.file:
+    src: "{{ bootstrap_repo }}/configs/ghostty"
+    dest: "{{ home }}/.config/ghostty/config"
+    state: link
+    force: true
+
+- name: Drop the alacritty config left behind by an older bootstrap
+  ansible.builtin.file:
+    path: "{{ home }}/.alacritty.yml"
+    state: absent
+
+- name: Link helper scripts into ~/.local/bin
+  ansible.builtin.file:
+    src: "{{ bootstrap_repo }}/bin/{{ item }}"
+    dest: "{{ local_bin }}/{{ item }}"
+    state: link
+    force: true
+  loop: "{{ binaries }}"
+
+# The scripts are still in bin/, they are just no longer linked onto PATH. Drop
+# an entry from this list once the symlink is gone from every machine.
+- name: Unlink helper scripts dropped from the binaries list
+  ansible.builtin.file:
+    path: "{{ local_bin }}/{{ item }}"
+    state: absent
+  loop:
+    - cce
+    - git-ready
+    - git-rebase
+    - rm-k8s-configs
+    - rm-pyc
+    - sprint-estimates

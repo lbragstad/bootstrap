@@ -1,0 +1,52 @@
+---
+# Bootstraps a workstation: installs development tools and chat clients, then
+# applies preferences. Safe to re-run; every task is idempotent.
+#
+#   ansible-playbook site.yml -K                  full bootstrap
+#   ansible-playbook site.yml --tags configure    preferences only, no sudo
+#   ansible-playbook site.yml --tags update -K    upgrade everything in place
+- name: Bootstrap workstation
+  hosts: workstation
+  gather_facts: true
+
+  # Several roles clone from https://github.com/, and the rendered ~/.gitconfig
+  # rewrites that prefix to ssh. The playbook runs non-interactively with no
+  # usable ssh agent, so those clones fail. Nothing here should depend on the
+  # user's personal git config anyway: hand git an empty global config. Note
+  # this must stay a literal — a play-level environment is templated during
+  # fact gathering, when ansible_facts is still empty.
+  environment:
+    GIT_CONFIG_GLOBAL: /dev/null
+
+  pre_tasks:
+    - name: Fail early on an unsupported platform
+      ansible.builtin.assert:
+        that: ansible_facts['os_family'] in ['RedHat', 'Darwin']
+        fail_msg: >-
+          This playbook targets Fedora and macOS;
+          detected os_family={{ ansible_facts['os_family'] }}.
+        quiet: true
+      tags: [always]
+
+    - name: Ensure ~/.local/bin exists
+      ansible.builtin.file:
+        path: "{{ local_bin }}"
+        state: directory
+        mode: "0755"
+      tags: [always]
+
+  roles:
+    - role: packages
+      tags: [packages, install]
+    - role: shell
+      tags: [shell, install, configure]
+    - role: dotfiles
+      tags: [dotfiles, configure]
+    - role: neovim
+      tags: [neovim, install, configure]
+    - role: tmux
+      tags: [tmux, install, configure]
+    - role: fonts
+      tags: [fonts, install]
+    - role: gnome
+      tags: [gnome, configure]

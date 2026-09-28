@@ -1,0 +1,8 @@
+---
+# The override only takes effect once SSSD re-reads its configuration. Name
+# resolution blips for a moment, so this is a handler rather than inline.
+- name: Restart sssd
+  become: true
+  ansible.builtin.systemd_service:
+    name: sssd
+    state: restarted

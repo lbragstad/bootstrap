@@ -1,0 +1,96 @@
+---
+# ansible.builtin.user shells out to usermod, which only edits /etc/passwd. An
+# account that comes from a directory over SSSD has no local entry at all, so
+# usermod fails with "does not exist in /etc/passwd". Asking getent for the
+# files service alone is what tells the two cases apart.
+- name: Check for a local passwd entry
+  ansible.builtin.command:
+    cmd: getent -s files passwd {{ ansible_facts['user_id'] | quote }}
+  register: shell_local_passwd
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Set zsh as the default shell
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_facts['user_id'] }}"
+    shell: "{{ shell_zsh.stdout }}"
+  when: shell_local_passwd.rc == 0
+
+# A directory account can only be changed in the directory, which we do not
+# control, or overridden locally. override_shell under [nss] is the machine-wide
+# override: sssd.conf(5) describes it as overriding "the login shell for all
+# users", rather than one named account, which is the point — it is the
+# workstation being set up, not a particular person. A conf.d snippet keeps this
+# out of sssd.conf itself, which is usually managed by whatever joined the
+# machine to the directory.
+- name: Override the login shell for directory accounts
+  become: true
+  when: shell_local_passwd.rc != 0
+  block:
+    # Snippets must carry the same owner and mode as sssd.conf or SSSD ignores
+    # the directory and logs an error. That is not a fixed pair: sssd runs as
+    # root on some releases and unprivileged as sssd:sssd on others, so copy
+    # whatever this machine actually uses instead of guessing.
+    - name: Read the ownership SSSD expects on its configuration
+      ansible.builtin.stat:
+        path: /etc/sssd/sssd.conf
+      register: shell_sssd_conf
+
+    - name: Fail when the account has no local entry and no SSSD to override
+      ansible.builtin.fail:
+        msg: >-
+          {{ ansible_facts['user_id'] }} has no /etc/passwd entry and this machine
+          has no /etc/sssd/sssd.conf, so there is nothing here that can change the
+          login shell. Change it wherever the account is defined.
+      when: not shell_sssd_conf.stat.exists
+
+    # An sssd.conf written by someone else can carry options sssctl does not
+    # recognise, and a check that was already failing before we touched anything
+    # says nothing about the snippet. Only a clean baseline going dirty is ours
+    # to roll back.
+    - name: Check the SSSD configuration before changing it
+      ansible.builtin.command:
+        cmd: sssctl config-check
+      register: shell_sssd_baseline
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Write the SSSD shell override
+      ansible.builtin.copy:
+        dest: /etc/sssd/conf.d/99-zsh.conf
+        content: |
+          # Managed by the bootstrap playbook.
+          # Directory accounts have no /etc/passwd entry for usermod to edit, so
+          # the login shell is overridden here instead.
+          [nss]
+          override_shell = {{ shell_zsh.stdout }}
+        owner: "{{ shell_sssd_conf.stat.pw_name }}"
+        group: "{{ shell_sssd_conf.stat.gr_name }}"
+        mode: "{{ shell_sssd_conf.stat.mode }}"
+      notify: Restart sssd
+
+    - name: Check the SSSD configuration
+      ansible.builtin.command:
+        cmd: sssctl config-check
+      register: shell_sssd_check
+      changed_when: false
+      failed_when:
+        - shell_sssd_baseline.rc == 0
+        - shell_sssd_check.rc != 0
+  rescue:
+    # Leaving a rejected snippet behind would break name resolution at the next
+    # boot, long after this run is forgotten — and on a machine whose only
+    # account is directory-backed, that means nobody can log in. Take it out.
+    - name: Remove the rejected SSSD shell override
+      ansible.builtin.file:
+        path: /etc/sssd/conf.d/99-zsh.conf
+        state: absent
+
+    - name: Report why the login shell could not be set
+      ansible.builtin.fail:
+        msg: >-
+          The login shell override was removed, so logins are unaffected.
+          {{ shell_sssd_check.stdout | default(ansible_failed_result.msg | default('')) }}

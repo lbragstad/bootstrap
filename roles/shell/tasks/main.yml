@@ -1,0 +1,85 @@
+---
+# command -v is a builtin, so this has to go through a shell. A missing zsh is
+# not an error: --tags configure can legitimately run before --tags install has
+# put zsh on the machine, in which case the login shell change waits for that run.
+- name: Find zsh
+  ansible.builtin.shell: command -v zsh  # noqa command-instead-of-shell
+  register: shell_zsh
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Report that the login shell change is deferred
+  ansible.builtin.debug:
+    msg: zsh is not installed yet, so the login shell was left alone. Run --tags install.
+  when: shell_zsh.rc != 0
+
+# Everything here needs root. Skipping it once the shell is already zsh means a
+# re-run of --tags configure needs no sudo at all.
+- name: Make zsh a valid login shell
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/shells
+    line: "{{ shell_zsh.stdout }}"
+    state: present
+  when:
+    - shell_zsh.rc == 0
+    - ansible_facts['user_shell'] != shell_zsh.stdout
+
+# How the login shell is set depends on where the account lives, not on which
+# account it is, so the two platforms need entirely different mechanisms.
+- name: Set the login shell on Fedora
+  ansible.builtin.import_tasks: fedora.yml
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - shell_zsh.rc == 0
+    - ansible_facts['user_shell'] != shell_zsh.stdout
+
+- name: Set the login shell on macOS
+  ansible.builtin.import_tasks: macos.yml
+  when:
+    - ansible_facts['os_family'] == 'Darwin'
+    - shell_zsh.rc == 0
+    - ansible_facts['user_shell'] != shell_zsh.stdout
+
+- name: Install oh-my-zsh
+  ansible.builtin.git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "{{ home }}/.oh-my-zsh"
+    depth: 1
+    version: master
+    # Only move to the tip under --tags update; oh-my-zsh changes often enough
+    # that a surprise update mid-bootstrap is noise.
+    update: "{{ bootstrap_update | bool }}"
+  tags: [update]
+
+- name: Install the solus zsh theme
+  ansible.builtin.copy:
+    src: "{{ bootstrap_repo }}/configs/solus.zsh-theme"
+    dest: "{{ home }}/.oh-my-zsh/themes/solus.zsh-theme"
+    mode: "0644"
+
+# git-completion.zsh loads git-completion.bash, so both have to be present.
+- name: Create the git completion directory
+  ansible.builtin.file:
+    path: "{{ home }}/.zsh"
+    state: directory
+    mode: "0755"
+
+- name: Link git completion scripts
+  ansible.builtin.file:
+    src: "{{ bootstrap_repo }}/configs/{{ item.src }}"
+    dest: "{{ home }}/{{ item.dest }}"
+    state: link
+    force: true
+  loop:
+    - {src: git-completion.bash, dest: .zsh/git-completion.bash}
+    - {src: git-completion.zsh, dest: _git}
+
+- name: Install gvm
+  ansible.builtin.shell:
+    cmd: >-
+      bash < <(curl -s -S -L
+      https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+    executable: /bin/bash
+    creates: "{{ home }}/.gvm/scripts/gvm"

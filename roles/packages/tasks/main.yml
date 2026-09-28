@@ -1,0 +1,8 @@
+---
+- name: Install Fedora packages
+  ansible.builtin.import_tasks: fedora.yml
+  when: ansible_facts['os_family'] == 'RedHat'
+
+- name: Install macOS packages
+  ansible.builtin.import_tasks: macos.yml
+  when: ansible_facts['os_family'] == 'Darwin'

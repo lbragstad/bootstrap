@@ -1,0 +1,63 @@
+---
+# Ghostty is not packaged by Fedora and is not on Flathub, so it comes from a
+# third-party copr. Override ghostty_copr if you would rather build it yourself.
+- name: Enable the ghostty copr
+  become: true
+  community.general.copr:
+    name: "{{ ghostty_copr }}"
+    state: enabled
+
+# Google only publishes el8 and el9 repositories; el9 is what their own Fedora
+# instructions point at, and the package is a self-contained bundle anyway.
+- name: Add the Google Cloud CLI repository
+  become: true
+  ansible.builtin.yum_repository:
+    name: google-cloud-cli
+    description: Google Cloud CLI
+    baseurl: https://packages.cloud.google.com/yum/repos/cloud-sdk-el9-$basearch
+    gpgkey: https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    gpgcheck: true
+    enabled: true
+
+- name: Add the Docker CE repository
+  become: true
+  ansible.builtin.yum_repository:
+    name: docker-ce-stable
+    description: Docker CE Stable - $basearch
+    baseurl: "https://download.docker.com/linux/fedora/{{ docker_releasever }}/$basearch/stable"
+    gpgkey: https://download.docker.com/linux/fedora/gpg
+    gpgcheck: true
+    enabled: true
+  when: install_docker | bool
+
+- name: Install development tools and applications
+  become: true
+  ansible.builtin.dnf:
+    name: "{{ packages_fedora + (packages_fedora_docker if install_docker | bool else []) }}"
+    state: present
+
+# The never tag is not enough on its own. Role-level tags propagate onto every
+# task, so --tags packages or --tags install names a tag this task carries,
+# which is exactly what defeats never — and a full system upgrade is not what
+# either of those asks for. bootstrap_update keys off the requested tags.
+- name: Upgrade all packages
+  become: true
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest  # noqa package-latest - deliberate, only under --tags update
+  when: bootstrap_update | bool
+  tags: [update]
+
+- name: Add the flathub remote
+  community.general.flatpak_remote:
+    name: flathub
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+    method: user
+    state: present
+
+- name: Install flatpaks
+  community.general.flatpak:
+    name: "{{ packages_fedora_flatpaks }}"
+    remote: flathub
+    method: user
+    state: present

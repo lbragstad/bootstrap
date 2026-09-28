@@ -1,0 +1,48 @@
+---
+- name: Locate Homebrew
+  ansible.builtin.stat:
+    path: "{{ homebrew_prefix }}/bin/brew"
+  register: packages_brew
+
+# The installer takes care of the Xcode command line tools if they are missing.
+# It needs an administrator password on a fresh machine, so run the play with -K.
+- name: Install Homebrew
+  ansible.builtin.shell:
+    cmd: >-
+      /bin/bash -c "$(curl -fsSL
+      https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    creates: "{{ homebrew_prefix }}/bin/brew"
+  environment:
+    NONINTERACTIVE: "1"
+  when: not packages_brew.stat.exists
+
+- name: Install command line tools
+  community.general.homebrew:
+    name: "{{ packages_macos }}"
+    state: present
+    path: "{{ homebrew_prefix }}/bin"
+    update_homebrew: true
+
+- name: Install applications and fonts
+  community.general.homebrew_cask:
+    name: "{{ packages_macos_casks }}"
+    state: present
+    path: "{{ homebrew_prefix }}/bin"
+    accept_external_apps: true
+
+# See the note in fedora.yml: never is defeated by the role-level tags, so
+# these key off bootstrap_update rather than the tag alone.
+- name: Upgrade all Homebrew packages
+  community.general.homebrew:
+    upgrade_all: true
+    path: "{{ homebrew_prefix }}/bin"
+    update_homebrew: true
+  when: bootstrap_update | bool
+  tags: [update]
+
+- name: Upgrade all Homebrew casks
+  community.general.homebrew_cask:
+    upgrade_all: true
+    path: "{{ homebrew_prefix }}/bin"
+  when: bootstrap_update | bool
+  tags: [update]

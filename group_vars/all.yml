@@ -1,0 +1,83 @@
+---
+# Where this repository lives. Everything is symlinked back here so edits to a
+# config take effect without re-running the playbook.
+bootstrap_repo: "{{ playbook_dir }}"
+
+home: "{{ ansible_facts['env']['HOME'] }}"
+local_bin: "{{ ansible_facts['env']['HOME'] }}/.local/bin"
+
+# Apple silicon keeps Homebrew under /opt; Intel Macs use /usr/local. Unused on
+# Fedora, but it is cheap to always have it defined.
+homebrew_prefix: "{{ '/opt/homebrew' if ansible_facts['architecture'] == 'arm64' else '/usr/local' }}"
+
+# True when the play was invoked with --tags update. Tasks that would otherwise
+# pin whatever is already on disk (neovim, tmux plugins, brew formulae) use this
+# to pull the latest version instead.
+bootstrap_update: "{{ 'update' in ansible_run_tags }}"
+
+# Docker CE publishes per-release repositories and usually lags a Fedora
+# release by a few weeks. Set this to false (or to an older releasever) if the
+# repository 404s right after a Fedora upgrade.
+install_docker: true
+docker_releasever: "$releasever"
+
+# Fedora does not package ghostty and it is not on Flathub, so it comes from a
+# copr. This one tracks upstream releases and builds for both x86_64 and aarch64.
+ghostty_copr: scottames/ghostty
+
+# git identity, rendered into ~/.gitconfig.
+git_user_name: Lance Bragstad
+git_user_email: lbragsta@redhat.com
+git_review_username: ldbragst
+git_signing_key: "{{ ansible_facts['env']['HOME'] }}/.ssh/id_ecdsa_redhat.pub"
+git_safe_directories:
+  - "{{ ansible_facts['env']['HOME'] }}/go/src/github.com/rhmdnd/stackrox"
+
+# Configs symlinked to ~/.<name>. gitconfig is deliberately absent: it carries
+# absolute paths, so it is templated rather than linked. ghostty is absent too,
+# since it wants ~/.config/ghostty/config rather than a dotfile.
+dotfiles:
+  - tmux.conf
+  - zshrc
+  - gitignore_global
+
+# Helper scripts in bin/ symlinked into ~/.local/bin.
+binaries:
+  - cockpit
+  - desk
+  - fail
+  - phonetic-alphabet
+  - speed-test
+  - tower
+  - try
+  - upgrade-nvim
+
+# mason package names, which do not always match the lspconfig server names.
+# Keep this in sync with ensure_installed in nvim/lua/lbragstad/lsp/init.lua.
+nvim_language_servers:
+  - gopls
+  - pyright
+  - bash-language-server
+  - marksman
+
+nvim_appimage_url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+
+nerd_font_url: https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip
+
+# GNOME keybindings and dock, applied on Fedora only.
+gnome_settings:
+  - schema: org.gnome.desktop.wm.keybindings
+    key: switch-to-workspace-left
+    value: "['<Primary><Alt>Left']"
+  - schema: org.gnome.desktop.wm.keybindings
+    key: switch-to-workspace-right
+    value: "['<Primary><Alt>Right']"
+  - schema: org.gnome.desktop.wm.keybindings
+    key: move-to-workspace-left
+    value: "['<Ctrl><Shift>Left']"
+  - schema: org.gnome.desktop.wm.keybindings
+    key: move-to-workspace-right
+    value: "['<Ctrl><Shift>Right']"
+  - schema: org.gnome.shell
+    key: favorite-apps
+    value: "['org.gnome.Nautilus.desktop', 'com.mitchellh.ghostty.desktop', 'firefox.desktop']"

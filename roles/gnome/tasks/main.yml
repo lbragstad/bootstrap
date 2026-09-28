@@ -1,0 +1,30 @@
+---
+# Workspace keybindings and the dock. GNOME only, and only when there is a
+# session bus to talk to, so this no-ops over SSH or in a container.
+- name: Apply GNOME preferences
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['env']['DBUS_SESSION_BUS_ADDRESS'] is defined
+  block:
+    - name: Read the current GNOME settings
+      ansible.builtin.command:
+        cmd: "gsettings get {{ item.schema }} {{ item.key }}"
+      loop: "{{ gnome_settings }}"
+      loop_control:
+        label: "{{ item.schema }} {{ item.key }}"
+      register: gnome_current
+      changed_when: false
+      failed_when: false
+      # Needed so the comparison below still has something to read under --check.
+      check_mode: false
+
+    - name: Set GNOME preferences
+      ansible.builtin.command:
+        cmd: "gsettings set {{ item.item.schema }} {{ item.item.key }} {{ item.item.value | quote }}"
+      loop: "{{ gnome_current.results }}"
+      loop_control:
+        label: "{{ item.item.schema }} {{ item.item.key }}"
+      when:
+        - item.rc == 0
+        - item.stdout != item.item.value
+      changed_when: true

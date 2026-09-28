@@ -1,0 +1,73 @@
+---
+# golang comes from packages rather than gvm so we avoid the bootstrap problem
+# compiling later versions of Go. See
+# https://github.com/moovweb/gvm#a-note-on-compiling-go-15
+packages_fedora:
+  - bison
+  - dnf-plugins-core
+  - ffmpeg-free
+  - ffmpeg-free-devel
+  - flatpak
+  - fontconfig
+  - gcc-c++
+  - gh
+  - ghostty
+  - git
+  - git-delta
+  - git-lfs
+  - gnome-shell-extension-pop-shell
+  - gnome-tweaks
+  - golang
+  - google-cloud-cli
+  - htop
+  - krb5-workstation
+  # mason installs pyright and bash-language-server as npm packages, so node is
+  # a hard dependency of the neovim role rather than something used directly.
+  - nodejs
+  - npm
+  - python3-pip
+  - skopeo
+  - tmux
+  - unzip
+  - util-linux
+  - xprop
+  - zsh
+
+packages_fedora_docker:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+
+packages_fedora_flatpaks:
+  - org.signal.Signal
+
+packages_macos:
+  - bison
+  - coreutils
+  - ffmpeg
+  - gh
+  - git
+  - git-delta
+  - git-lfs
+  - go
+  - htop
+  - krb5
+  # See the note on the Fedora list: mason needs npm for two language servers.
+  - node
+  - python
+  - skopeo
+  - tmux
+  - zsh
+
+# Slack and Signal have no public download URL worth scripting on Linux, but
+# Homebrew packages both, so the Mac gets them for free.
+packages_macos_casks:
+  - docker
+  - font-hack-nerd-font
+  # Renamed upstream from google-cloud-sdk.
+  - gcloud-cli
+  - ghostty
+  - signal
+  - slack
