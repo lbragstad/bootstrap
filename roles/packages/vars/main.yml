@@ -20,6 +20,7 @@ packages_fedora:
   - golang
   - google-cloud-cli
   - htop
+  - jq
   - krb5-workstation
   # mason installs pyright and bash-language-server as npm packages, so node is
   # a hard dependency of the neovim role rather than something used directly.
@@ -31,6 +32,7 @@ packages_fedora:
   - unzip
   - util-linux
   - xprop
+  - yq
   - zsh
 
 packages_fedora_docker:
@@ -53,12 +55,14 @@ packages_macos:
   - git-lfs
   - go
   - htop
+  - jq
   - krb5
   # See the note on the Fedora list: mason needs npm for two language servers.
   - node
   - python
   - skopeo
   - tmux
+  - yq
   - zsh
 
 # Slack and Signal have no public download URL worth scripting on Linux, but
