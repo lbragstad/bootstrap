@@ -36,6 +36,26 @@
     name: "{{ packages_fedora + (packages_fedora_docker if install_docker | bool else []) }}"
     state: present
 
+# Fedora's updates repo sets metadata_expire=6h, so a younger cache is reused
+# as-is — and because Fedora prunes a package from the mirrors as soon as the
+# build replacing it lands, an upgrade planned from a few-hour-old cache asks
+# for rpms that were deleted hours ago. libdnf5 then aborts the transaction with
+# "Failed to download packages", which the dnf5 module reports with an empty
+# failures list, so the output never names the package that 404'd.
+#
+# The module's own update_cache cannot prevent this: it builds its RepoQuery
+# before create_repos_from_system_configuration() registers anything, so it
+# iterates an empty set and marks no cache expired (ansible-core 2.20.7,
+# modules/dnf5.py:632). Expire the cache out of band instead; the upgrade that
+# follows then refreshes it as it loads the repos.
+- name: Expire the dnf metadata cache
+  become: true
+  ansible.builtin.command:  # noqa command-instead-of-module - update_cache is a no-op, see above
+    cmd: dnf clean expire-cache
+  changed_when: false
+  when: bootstrap_update | bool
+  tags: [update]
+
 # The never tag is not enough on its own. Role-level tags propagate onto every
 # task, so --tags packages or --tags install names a tag this task carries,
 # which is exactly what defeats never — and a full system upgrade is not what
