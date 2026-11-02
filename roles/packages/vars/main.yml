@@ -64,6 +64,7 @@ packages_macos:
   - skopeo
   - tmux
   - uv
+  - vale
   - yq
   - zsh
 

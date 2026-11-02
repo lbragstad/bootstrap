@@ -64,6 +64,15 @@ nvim_appimage_url: https://github.com/neovim/neovim/releases/latest/download/nvi
 
 nerd_font_url: https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip
 
+# Fedora does not package vale and upstream publishes no rpm, so Linux takes the
+# release tarball. The asset names carry the version, so there is no
+# latest/download URL to follow the way neovim's appimage does — bump
+# vale_version to upgrade. macOS gets the formula instead, via packages_macos.
+vale_version: 3.25.1
+vale_url: >-
+  https://github.com/vale-cli/vale/releases/download/v{{ vale_version }}/vale_{{ vale_version }}_Linux_{{
+  '64-bit' if ansible_facts['architecture'] == 'x86_64' else 'arm64' }}.tar.gz
+
 # GNOME keybindings and dock, applied on Fedora only.
 gnome_settings:
   - schema: org.gnome.desktop.wm.keybindings

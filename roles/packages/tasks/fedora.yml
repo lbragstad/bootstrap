@@ -48,6 +48,28 @@
   when: bootstrap_update | bool
   tags: [update]
 
+# The tarball is a flat archive of vale, LICENSE and README, so only the binary
+# is worth unpacking. unarchive would re-download on every run if it were left
+# to decide for itself, and creates: would pin whatever is already on disk, so
+# compare versions instead: that way bumping vale_version reinstalls.
+- name: Check the installed vale version
+  ansible.builtin.command:
+    cmd: "{{ local_bin }}/vale --version"
+  register: packages_vale
+  changed_when: false
+  failed_when: false
+  tags: [update]
+
+- name: Install vale
+  ansible.builtin.unarchive:
+    src: "{{ vale_url }}"
+    dest: "{{ local_bin }}"
+    remote_src: true
+    include: [vale]
+    mode: "0755"
+  when: vale_version not in packages_vale.stdout | default('', true)
+  tags: [update]
+
 - name: Add the flathub remote
   community.general.flatpak_remote:
     name: flathub
