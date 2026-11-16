@@ -64,6 +64,13 @@ nvim_appimage_url: https://github.com/neovim/neovim/releases/latest/download/nvi
 
 nerd_font_url: https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip
 
+# AWS publishes an installer for the self-contained v2 bundle. Run without
+# --system it installs under ~/.local/share/aws-cli and symlinks aws and
+# aws_completer into XDG_BIN_HOME, so it needs no sudo. Fedora's awscli2 rpm is
+# an alternative, but it trails upstream and drags a python stack in behind it.
+# macOS gets the Homebrew formula instead, via packages_macos.
+awscli_install_url: https://awscli.amazonaws.com/v2/install.sh
+
 # Fedora does not package vale and upstream publishes no rpm, so Linux takes the
 # release tarball. The asset names carry the version, so there is no
 # latest/download URL to follow the way neovim's appimage does — bump

@@ -90,6 +90,31 @@
   when: vale_version not in packages_vale.stdout | default('', true)
   tags: [update]
 
+# The installer is idempotent on its own: it resolves the latest release,
+# compares it against what is on disk and exits early when they match. But
+# there is no pinned version to key off the way vale has, so an ungated run
+# would quietly upgrade the cli. Gate it like the rest of the role instead —
+# install when aws is missing, upgrade only under --tags update.
+#
+# It verifies the download against AWS's signing key, which needs gpg; gnupg2
+# and unzip are both in packages_fedora, installed by the task above.
+- name: Check for the AWS CLI
+  ansible.builtin.stat:
+    path: "{{ local_bin }}/aws"
+  register: packages_awscli
+  tags: [update]
+
+- name: Install the AWS CLI
+  ansible.builtin.shell:
+    cmd: set -o pipefail && curl -fsSL "{{ awscli_install_url }}" | bash
+    executable: /bin/bash
+  environment:
+    XDG_BIN_HOME: "{{ local_bin }}"
+  register: packages_awscli_install
+  changed_when: "'nothing to do' not in packages_awscli_install.stdout"
+  when: not packages_awscli.stat.exists or bootstrap_update | bool
+  tags: [update]
+
 - name: Add the flathub remote
   community.general.flatpak_remote:
     name: flathub

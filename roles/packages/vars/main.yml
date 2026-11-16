@@ -17,6 +17,8 @@ packages_fedora:
   - git-lfs
   - gnome-shell-extension-pop-shell
   - gnome-tweaks
+  # The AWS CLI installer verifies its download against AWS's signing key.
+  - gnupg2
   - golang
   - google-cloud-cli
   - htop
@@ -47,6 +49,9 @@ packages_fedora_flatpaks:
   - org.signal.Signal
 
 packages_macos:
+  # The formula is the v2 cli, and upgrade_all keeps it current. Fedora takes
+  # AWS's installer instead; see the note on awscli_install_url.
+  - awscli
   - bison
   - coreutils
   - ffmpeg
