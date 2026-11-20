@@ -12,10 +12,14 @@ vim.opt.scrolloff = 100
 vim.opt.cmdheight = 1
 vim.opt.background = 'dark'
 
--- Folding (treesitter-based); start with everything unfolded
+-- Folding (treesitter-based). Files open as an outline: foldlevelstart closes
+-- every fold, leaving top-level declarations and their signatures visible.
+-- zR opens everything, za toggles the fold under the cursor. Filetypes with no
+-- parser installed (see nvim_treesitter_parsers) compute no folds and open
+-- normally.
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-vim.opt.foldlevelstart = 99
+vim.opt.foldlevelstart = 0
 
 -- Treat hyphenated words as one word
 vim.cmd [[set iskeyword+=-]]
