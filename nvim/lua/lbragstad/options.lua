@@ -12,6 +12,11 @@ vim.opt.scrolloff = 100
 vim.opt.cmdheight = 1
 vim.opt.background = 'dark'
 
+-- Folding (treesitter-based); start with everything unfolded
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.opt.foldlevelstart = 99
+
 -- Treat hyphenated words as one word
 vim.cmd [[set iskeyword+=-]]
 
