@@ -62,6 +62,40 @@ nvim_language_servers:
 
 nvim_appimage_url: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
 
+# nvim-treesitter's main branch compiles parsers by shelling out to the
+# tree-sitter CLI; the old master branch invoked cc directly and needed nothing
+# installed. Without the CLI every parser install fails with ENOENT and the
+# editor silently falls back to regex syntax, so this is a hard dependency of
+# the neovim role rather than an optional extra.
+#
+# Upstream publishes the binary bare-gzipped rather than in a tarball, so there
+# is nothing for unarchive to unpack — the role gunzips it by hand. The asset
+# names carry no version, so latest/download follows upstream the way the
+# neovim appimage does. macOS takes the formula instead, via packages_macos.
+treesitter_cli_arch: >-
+  {{ 'macos-arm64' if ansible_facts['os_family'] == 'Darwin'
+  else ('linux-arm64' if ansible_facts['architecture'] in ['arm64', 'aarch64'] else 'linux-x64') }}
+treesitter_cli_url: >-
+  https://github.com/tree-sitter/tree-sitter/releases/latest/download/tree-sitter-{{
+  treesitter_cli_arch }}.gz
+
+# Treesitter parsers to compile. The main branch has no ensure_installed, so
+# nothing installs these on first start the way mason handles language servers:
+# a missing parser means no folds, no treesitter highlighting and no treesitter
+# indent for that filetype. Roughly tracks nvim_language_servers plus the
+# markup and config formats that turn up in every repo.
+nvim_treesitter_parsers:
+  - bash
+  - dockerfile
+  - go
+  - gomod
+  - json
+  - lua
+  - markdown
+  - markdown_inline
+  - python
+  - yaml
+
 nerd_font_url: https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip
 
 # AWS publishes an installer for the self-contained v2 bundle. Run without

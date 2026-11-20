@@ -18,6 +18,48 @@
   when: ansible_facts['os_family'] == 'Darwin'
   tags: [update]
 
+# nvim-treesitter compiles every parser with this; see treesitter_cli_url.
+# macOS gets the formula through packages_macos, so this is Fedora only.
+# Upstream ships a bare .gz rather than a tarball, which unarchive cannot
+# unpack, so gunzip it by hand. The CLI reports its own version, so gate on
+# that: install when missing, re-download only under --tags update.
+- name: Check for the tree-sitter CLI
+  ansible.builtin.command:
+    cmd: "{{ local_bin }}/tree-sitter --version"
+  register: neovim_treesitter_cli
+  changed_when: false
+  failed_when: false
+  tags: [update]
+
+- name: Install the tree-sitter CLI
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - neovim_treesitter_cli.rc != 0 or bootstrap_update | bool
+  tags: [update]
+  block:
+    - name: Download the tree-sitter CLI
+      ansible.builtin.get_url:
+        url: "{{ treesitter_cli_url }}"
+        dest: /tmp/tree-sitter.gz
+        mode: "0644"
+        force: true
+
+    - name: Unpack the tree-sitter CLI
+      ansible.builtin.shell:
+        cmd: set -o pipefail && gunzip -c /tmp/tree-sitter.gz > "{{ local_bin }}/tree-sitter"
+        executable: /bin/bash
+      changed_when: true
+
+    - name: Make the tree-sitter CLI executable
+      ansible.builtin.file:
+        path: "{{ local_bin }}/tree-sitter"
+        mode: "0755"
+  always:
+    - name: Remove the tree-sitter download
+      ansible.builtin.file:
+        path: /tmp/tree-sitter.gz
+        state: absent
+
 - name: Create ~/.config
   ansible.builtin.file:
     path: "{{ home }}/.config"
@@ -91,6 +133,25 @@
     - name: Install language servers
       ansible.builtin.command:
         cmd: "nvim --headless -c 'MasonInstall {{ nvim_language_servers | join(' ') }}' -c 'quitall'"
+      changed_when: false
+      timeout: 900
+      tags: [update]
+
+    # The main branch has no ensure_installed, so parsers never install
+    # themselves — without this a fresh machine gets regex syntax and no
+    # folding. install() is async and returns a handle; :wait() makes it
+    # usable headless, the way MasonInstall is synchronous above. It skips
+    # parsers already built unless force is set, so re-runs are cheap.
+    #
+    # install() takes a Lua table, so the list is rendered as a Lua table
+    # literal: to_json on the list would emit a JSON array, whose [] brackets
+    # are a syntax error in Lua. Quote the elements individually instead.
+    - name: Install treesitter parsers
+      ansible.builtin.command:
+        cmd: >-
+          nvim --headless
+          -c 'lua require("nvim-treesitter").install({ {{ nvim_treesitter_parsers | map('to_json') | join(', ') }} }):wait(600000)'
+          -c 'quitall'
       changed_when: false
       timeout: 900
       tags: [update]

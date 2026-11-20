@@ -68,6 +68,9 @@ packages_macos:
   - python
   - skopeo
   - tmux
+  # nvim-treesitter's main branch compiles parsers with this. Fedora packages
+  # no usable build, so it takes the release binary; see treesitter_cli_url.
+  - tree-sitter
   - uv
   - vale
   - yq
