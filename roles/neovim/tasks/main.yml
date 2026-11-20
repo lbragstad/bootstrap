@@ -50,8 +50,16 @@
   # nvim itself lives in ~/.local/bin on Fedora, and mason shells out to go, npm
   # and pip to build the language servers. Neither is necessarily on the PATH
   # ansible inherits, so put both prefixes in front of it.
+  #
+  # Fedora's golang rpm ships GOTOOLCHAIN=local in /usr/lib/golang/go.env so that
+  # builds always use the packaged compiler. mason installs gopls at whatever
+  # version it considers current, and that version's go.mod regularly requires a
+  # newer go than Fedora has packaged yet, which makes the build fail outright
+  # rather than fall back. Restoring the upstream default lets go fetch the
+  # toolchain it needs into the module cache.
   environment:
     PATH: "{{ local_bin }}:{{ homebrew_prefix }}/bin:{{ ansible_facts['env']['PATH'] }}"
+    GOTOOLCHAIN: auto
   block:
     # plugins.lua clones packer itself on first start, but it does so as a side
     # effect of a run that is expected to fail, which means a clone that fails
