@@ -1,0 +1,25 @@
+---
+# The archive holds the binary alongside its completions, man page and
+# licenses, so only ant itself is worth unpacking. The idempotency problem is
+# vale's: unarchive would re-download on every run if left to decide for
+# itself, and creates: would pin whatever is already on disk, so compare
+# versions instead — that way bumping ant_version reinstalls. The binary
+# prints "ant version <x.y.z>", so the pinned version is a plain substring
+# check against its output.
+- name: Check the installed ant version
+  ansible.builtin.command:
+    cmd: "{{ local_bin }}/ant --version"
+  register: packages_ant
+  changed_when: false
+  failed_when: false
+  tags: [update]
+
+- name: Install ant
+  ansible.builtin.unarchive:
+    src: "{{ ant_url }}"
+    dest: "{{ local_bin }}"
+    remote_src: true
+    include: [ant]
+    mode: "0755"
+  when: ant_version not in packages_ant.stdout | default('', true)
+  tags: [update]

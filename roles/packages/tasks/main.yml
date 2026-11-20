@@ -6,3 +6,9 @@
 - name: Install macOS packages
   ansible.builtin.import_tasks: macos.yml
   when: ansible_facts['os_family'] == 'Darwin'
+
+# Both platforms install the ant cli the same way, from a release archive, so
+# the only difference between them is the asset name — see ant_url. That makes
+# this the one part of the role that needs no per-platform branch.
+- name: Install the ant cli
+  ansible.builtin.import_tasks: ant.yml

@@ -80,6 +80,25 @@ vale_url: >-
   https://github.com/vale-cli/vale/releases/download/v{{ vale_version }}/vale_{{ vale_version }}_Linux_{{
   '64-bit' if ansible_facts['architecture'] == 'x86_64' else 'arm64' }}.tar.gz
 
+# Anthropic ships no rpm repository and no Homebrew formula for the ant cli, so
+# both platforms take a release asset. Like vale the names carry the version
+# with no latest/download alias to follow, so bump ant_version to upgrade.
+#
+# Upstream's install snippet derives the asset name from uname, which is only
+# right on Linux: the mac builds are published as ant_<version>_macos_<arch>.zip,
+# so uname's "darwin" and a .tar.gz suffix would both 404. Branch on os_family
+# instead. That snippet also untars into /usr/local/bin under sudo; everything
+# else hand-installed here lands in ~/.local/bin, which is already on PATH, so
+# this follows the rest of the repo and stays sudo-free.
+ant_version: 2.12.1
+ant_arch: "{{ 'arm64' if ansible_facts['architecture'] in ['arm64', 'aarch64'] else 'amd64' }}"
+ant_asset: >-
+  {{ 'macos_' + ant_arch + '.zip' if ansible_facts['os_family'] == 'Darwin'
+  else 'linux_' + ant_arch + '.tar.gz' }}
+ant_url: >-
+  https://github.com/anthropics/anthropic-cli/releases/download/v{{ ant_version }}/ant_{{ ant_version }}_{{
+  ant_asset }}
+
 # GNOME keybindings and dock, applied on Fedora only.
 gnome_settings:
   - schema: org.gnome.desktop.wm.keybindings
