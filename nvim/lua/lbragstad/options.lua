@@ -17,9 +17,26 @@ vim.opt.background = 'dark'
 -- zR opens everything, za toggles the fold under the cursor. Filetypes with no
 -- parser installed (see nvim_treesitter_parsers) compute no folds and open
 -- normally.
+--
+-- foldnestmax caps how deep folds go. At 1 a function is one fold and its body
+-- is flat, so opening a function shows all of it — without the cap every
+-- nested loop and conditional is another fold to open. The docs scope
+-- foldnestmax to the indent and syntax methods, but it clamps expr levels too.
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldlevelstart = 0
+vim.opt.foldnestmax = 1
+
+-- Languages that nest functions inside a class or module block put their first
+-- function level at depth 2, so a global cap of 1 would collapse a whole class
+-- into one fold and leave its methods unfoldable. Give those one more level.
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("FoldNesting", { clear = true }),
+  pattern = { "python" },
+  callback = function()
+    vim.opt_local.foldnestmax = 2
+  end,
+})
 
 -- Treat hyphenated words as one word
 vim.cmd [[set iskeyword+=-]]
